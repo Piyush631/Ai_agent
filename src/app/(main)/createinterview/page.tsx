@@ -6,8 +6,12 @@ import { FaRegUser } from "react-icons/fa";
 import { IoMdWallet } from "react-icons/io";
 import { PiBrain } from "react-icons/pi";
 import { FaArrowRightLong } from "react-icons/fa6";
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import axios from "axios";
+type InterviewQuestion = {
+  question: string;
+  type: string;
+};
 const data = [
   {
     name: "Technical",
@@ -42,14 +46,49 @@ export default function createInterview() {
     duration: "",
     interviewType: [],
   });
+  const [question, setQuestion] = useState<InterviewQuestion[]>([]);
   const [type, setType] = useState<string[]>([]);
+
+  useEffect(() => {
+    console.log("Questions state updated:", question);
+  }, [question]);
+
   const handleInputChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    console.log(formData);
   };
   function handleSubmit() {
     console.log(formData);
+    GenerateQuestion();
   }
+  const GenerateQuestion = async () => {
+    try {
+      const result = await axios.post("/api/openai", { ...formData });
+
+      let content = result.data.content;
+
+      content = content.replace(/```json\s*([\s\S]*?)\s*```/, "$1").trim();
+
+      const firstBrace = content.indexOf("{");
+      const lastBrace = content.lastIndexOf("}");
+
+      const jsonString = content.substring(firstBrace, lastBrace + 1);
+
+      const parsedData = JSON.parse(jsonString);
+      const questions = parsedData.interviewQuestions;
+      
+      console.log("Raw questions:", questions);
+      
+      if (Array.isArray(questions)) {
+        setQuestion(questions);
+        
+      } else {
+        console.error("Questions is not an array:", questions);
+      }
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+    }
+  };
+
   function handleType(name: string) {
     const updatedTypes = type.includes(name)
       ? type.filter((item) => item !== name)
@@ -138,13 +177,31 @@ export default function createInterview() {
               className="bg-blue-600 text-sm  flex items-center justify-center gap-2  text-white rounded-lg px-4 py-1.5"
             >
               <div>Generate Questions</div>
-
               <div>
                 <FaArrowRightLong />
               </div>
             </button>
           </div>
         </div>
+
+        {/* Display Generated Questions */}
+        {question.length > 0 && (
+          <div className="mt-8 bg-white rounded-md p-4">
+            <h2 className="text-xl font-semibold mb-4">Generated Questions</h2>
+            <div className="space-y-4">
+              {question.map((q, index) => (
+                <div key={index} className="border-b pb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                      {q.type}
+                    </span>
+                  </div>
+                  <p className="text-gray-800">{q.question}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
