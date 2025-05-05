@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
 
   if (!username || !password || !email) {
     return NextResponse.json({
-      msg: "Invalid details",
+      msg: "Invalid details please ",
     });
   }
 }

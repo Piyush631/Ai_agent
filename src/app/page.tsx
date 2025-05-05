@@ -3,7 +3,7 @@
 export default function Home() {
   return (
     <div>
-      welcome to landing page
+      welcome to landing page seocnd page
       {/*  <div className="relative w-full  bg-[#141414] overflow-hidden">
       <div className="h-16 w-full bg-black">home </div>
       <div className="pt-36"></div>
