@@ -64,9 +64,16 @@ export default function CreateInterview({ step, setStep }: stepData) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
   function handleSubmit() {
-    console.log(formData);
-    setStep(step + 1);
     GenerateQuestion();
+  }
+  async function handleFinish() {
+    const response = await axios.post("/api/generatequestion", {
+      jobpostion: formData.jobposition,
+      jobdescription: formData.jobdescription,
+      duration: formData.duration,
+      interviewType: formData.interviewType,
+      question: question,
+    });
   }
   const GenerateQuestion = async () => {
     try {
@@ -183,6 +190,15 @@ export default function CreateInterview({ step, setStep }: stepData) {
               className="bg-blue-600 text-sm  flex items-center justify-center gap-2  text-white rounded-lg px-4 py-1.5"
             >
               <div>Generate Questions</div>
+              <div>
+                <FaArrowRightLong />
+              </div>
+            </button>
+            <button
+              onClick={handleFinish}
+              className="bg-blue-600 text-sm  flex items-center justify-center gap-2  text-white rounded-lg px-4 py-1.5"
+            >
+              <div>Finish</div>
               <div>
                 <FaArrowRightLong />
               </div>

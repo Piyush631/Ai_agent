@@ -7,7 +7,7 @@ import { RiCalendarScheduleLine } from "react-icons/ri";
 import { TfiMenuAlt } from "react-icons/tfi";
 import { RiBillLine } from "react-icons/ri";
 import { IoSettingsOutline } from "react-icons/io5";
-import { FaPlus, FaBars } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa6";
 import { RiMenuFold3Fill } from "react-icons/ri";
 import { RiMenuFold4Fill } from "react-icons/ri";
 
