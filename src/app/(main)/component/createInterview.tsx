@@ -1,44 +1,37 @@
 "use client";
-import { IoArrowBack } from "react-icons/io5";
 
-import { FaCode } from "react-icons/fa6";
+import { IoArrowBack } from "react-icons/io5";
+import { FaCode, FaArrowRightLong } from "react-icons/fa6";
 import { FaRegUser } from "react-icons/fa";
 import { IoMdWallet } from "react-icons/io";
 import { PiBrain } from "react-icons/pi";
-import { FaArrowRightLong } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import axios from "axios";
+
 type InterviewQuestion = {
   question: string;
   type: string;
 };
+
 const data = [
-  {
-    name: "Technical",
-    icon: <FaCode />,
-  },
-  {
-    name: "Behavioral",
-    icon: <FaRegUser />,
-  },
-  {
-    name: "Experience",
-    icon: <IoMdWallet />,
-  },
-  {
-    name: "Leadership",
-    icon: <PiBrain />,
-  },
-  {
-    name: "Problem Solving",
-    icon: <PiBrain />,
-  },
+  { name: "Technical", icon: <FaCode /> },
+  { name: "Behavioral", icon: <FaRegUser /> },
+  { name: "Experience", icon: <IoMdWallet /> },
+  { name: "Leadership", icon: <PiBrain /> },
+  { name: "Problem Solving", icon: <PiBrain /> },
 ];
-interface stepData {
+
+interface StepData {
   step: number;
   setStep: (value: number) => void;
+  setInterviewId: (value: string) => void;
 }
-export default function CreateInterview({ step, setStep }: stepData) {
+
+export default function CreateInterview({
+  step,
+  setStep,
+  setInterviewId,
+}: StepData) {
   const [formData, setFormData] = useState<{
     jobposition: string;
     jobdescription: string;
@@ -50,92 +43,23 @@ export default function CreateInterview({ step, setStep }: stepData) {
     duration: "",
     interviewType: [],
   });
+
   const [question, setQuestion] = useState<InterviewQuestion[]>([]);
   const [type, setType] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log("Questions state updated:", question);
-  }, [question]);
-  useEffect(() => {
     setStep(0);
   }, []);
 
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  function handleSubmit() {
-    GenerateQuestion();
-  }
-  async function handleFinish() {
-    console.log("hlo");
-    console.log(formData.jobposition);
-    console.log(formData.jobdescription);
 
-    if (
-      !formData.jobposition.trim() ||
-      !formData.jobdescription.trim() ||
-      !formData.duration ||
-      formData.interviewType.length === 0 ||
-      question.length === 0
-    ) {
-      let missingFields = [];
-      if (!formData.jobposition.trim()) missingFields.push("Job Position");
-      if (!formData.jobdescription.trim()) missingFields.push("Job Description");
-      if (!formData.duration) missingFields.push("Duration");
-      if (formData.interviewType.length === 0) missingFields.push("Interview Type");
-      if (question.length === 0) missingFields.push("Generated Questions");
-
-      alert(
-        `Please fill in all fields and generate questions before finishing.\nMissing fields: ${missingFields.join(", ")}`
-      );
-      return;
-    }
-
-    console.log("Submitting interview with:", formData);
-    console.log("question", question)
-    try {
-      const response = await axios.post("/api/generatequestion", {
-        jobposition: formData.jobposition,
-        jobdescription: formData.jobdescription,
-        duration: formData.duration,
-        interviewType: formData.interviewType,
-        question: question,
-        userId: 1,
-      });
-
-      console.log("Job post created:", response.data);
-    } catch (error) {
-      console.error("Failed to create job post:", error);
-    }
-  }
-
-  const GenerateQuestion = async () => {
-    try {
-      const result = await axios.post("/api/openai", { ...formData });
-
-      let content = result.data.content;
-
-      content = content.replace(/```json\s*([\s\S]*?)\s*```/, "$1").trim();
-
-      const firstBrace = content.indexOf("{");
-      const lastBrace = content.lastIndexOf("}");
-
-      const jsonString = content.substring(firstBrace, lastBrace + 1);
-
-      const parsedData = JSON.parse(jsonString);
-      const questions = parsedData.interviewQuestions;
-
-      if (Array.isArray(questions)) {
-        setQuestion(questions);
-      } else {
-        console.error("Questions is not an array:", questions);
-      }
-    } catch (error) {
-      console.error("Error parsing JSON:", error);
-    }
-  };
-
-  function handleType(name: string) {
+  const handleType = (name: string) => {
     const updatedTypes = type.includes(name)
       ? type.filter((item) => item !== name)
       : [...type, name];
@@ -145,118 +69,167 @@ export default function CreateInterview({ step, setStep }: stepData) {
       ...prev,
       interviewType: updatedTypes,
     }));
-  }
+  };
+
+  const GenerateQuestion = async (): Promise<InterviewQuestion[]> => {
+    try {
+      const result = await axios.post("/api/openai", { ...formData });
+
+      let content: string = result.data.content;
+      content = content.replace(/```json\s*([\s\S]*?)\s*```/, "$1").trim();
+
+      const firstBrace = content.indexOf("{");
+      const lastBrace = content.lastIndexOf("}");
+
+      if (firstBrace === -1 || lastBrace === -1)
+        throw new Error("Invalid JSON format");
+
+      const jsonString = content.substring(firstBrace, lastBrace + 1);
+      const parsedData = JSON.parse(jsonString);
+
+      const questions: InterviewQuestion[] = parsedData.interviewQuestions;
+
+      if (Array.isArray(questions)) {
+        return questions;
+      } else {
+        console.error("Questions is not an array:", questions);
+        return [];
+      }
+    } catch (error) {
+      console.error("Error generating questions:", error);
+      return [];
+    }
+  };
+
+  const handleSubmit = async () => {
+    const generatedQuestions = await GenerateQuestion();
+    setQuestion(generatedQuestions);
+
+    if (
+      !formData.jobposition.trim() ||
+      !formData.jobdescription.trim() ||
+      !formData.duration ||
+      formData.interviewType.length === 0 ||
+      generatedQuestions.length === 0
+    ) {
+      const missingFields = [];
+      if (!formData.jobposition.trim()) missingFields.push("Job Position");
+      if (!formData.jobdescription.trim())
+        missingFields.push("Job Description");
+      if (!formData.duration) missingFields.push("Duration");
+      if (formData.interviewType.length === 0)
+        missingFields.push("Interview Type");
+      if (generatedQuestions.length === 0)
+        missingFields.push("Generated Questions");
+
+      alert(
+        `Please fill in all fields and generate questions before finishing.\nMissing fields: ${missingFields.join(
+          ", "
+        )}`
+      );
+      return;
+    }
+
+    try {
+      const response = await axios.post("/api/generatequestion", {
+        ...formData,
+        question: generatedQuestions,
+        userId: 1,
+      });
+      setInterviewId(response.data.id);
+      setStep(1);
+      console.log(response.data.id);
+
+      console.log("Job post created:", response.data);
+    } catch (error) {
+      console.error("Failed to create job post:", error);
+    }
+  };
+
   return (
-    <div>
-      <div className=" h-full py-4 mx-auto lg:max-w-2/3 w-full ">
-        <div className="flex  my-3 items-center font-semibold gap-4">
-          <div className="text-2xl">
-            <IoArrowBack />
-          </div>
-          <div className="text-lg md:text-xl lg:text-2xl">
-            Create New Interview
-          </div>
+    <div className="h-full py-4 mx-auto lg:max-w-2/3 w-full">
+      <div className="flex my-3 items-center font-semibold gap-4">
+        <div className="text-2xl">
+          <IoArrowBack />
         </div>
-        <div className="bg-white rounded-md">
-          <div className="px-4 pb-1 pt-4 flex flex-col gap-2">
-            <div className="font-semibold">Job Position</div>
-            <div className="">
-              <input
-                type="text"
-                name="jobposition"
-                onChange={handleInputChange}
-                value={formData.jobposition}
-                className=" w-full  py-1.5  focus:outline-none  rounded-md border-1 border-gray-400 "
-                placeholder="e.g Full Stack Developer"
-              />
-            </div>
-          </div>
-          <div className="px-4 py-2 flex flex-col gap-2">
-            <div className="font-semibold">Job Description</div>
-            <div className="">
-              <textarea
-                rows={7}
-                name="jobdescription"
-                onChange={handleInputChange}
-                className="w-full py-1.5 focus:outline-none rounded-md border border-gray-400"
-                placeholder="Enter job description"
-              />
-            </div>
-          </div>
-          <div className="px-4 py-2 flex flex-col gap-2">
-            <div className="font-semibold">Interview Duration</div>
-            <div className="">
-              <select
-                name="duration"
-                onChange={handleInputChange}
-                className="w-full py-2 focus:outline-none rounded-md text-gray-500 border-1 border-gray-400 "
+        <div className="text-lg md:text-xl lg:text-2xl">
+          Create New Interview
+        </div>
+      </div>
+
+      <div className="bg-white rounded-md">
+        {/* Job Position */}
+        <div className="px-4 pb-1 pt-4 flex flex-col gap-2">
+          <div className="font-semibold">Job Position</div>
+          <input
+            type="text"
+            name="jobposition"
+            value={formData.jobposition}
+            onChange={handleInputChange}
+            className="w-full py-1.5 focus:outline-none rounded-md border border-gray-400"
+            placeholder="e.g Full Stack Developer"
+          />
+        </div>
+
+        {/* Job Description */}
+        <div className="px-4 py-2 flex flex-col gap-2">
+          <div className="font-semibold">Job Description</div>
+          <textarea
+            name="jobdescription"
+            rows={7}
+            value={formData.jobdescription}
+            onChange={handleInputChange}
+            className="w-full py-1.5 focus:outline-none rounded-md border border-gray-400"
+            placeholder="Enter job description"
+          />
+        </div>
+
+        {/* Interview Duration */}
+        <div className="px-4 py-2 flex flex-col gap-2">
+          <div className="font-semibold">Interview Duration</div>
+          <select
+            name="duration"
+            value={formData.duration}
+            onChange={handleInputChange}
+            className="w-full py-2 focus:outline-none rounded-md text-gray-500 border border-gray-400"
+          >
+            <option value="">Select duration</option>
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
+            <option value="45">45 minutes</option>
+          </select>
+        </div>
+
+        {/* Interview Type */}
+        <div className="px-4 pb-1 pt-4 flex flex-col gap-2">
+          <div className="font-semibold">Interview Type</div>
+          <div className="flex flex-wrap gap-3">
+            {data.map((d, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => handleType(d.name)}
+                className={`flex gap-1.5 px-5 cursor-pointer text-sm justify-center items-center border border-gray-400 rounded-xl py-1 ${
+                  type.includes(d.name) && "text-blue-600"
+                }`}
               >
-                <option className="text-gray-200" value="">
-                  Select duration
-                </option>
-                <option value="15">15 minutes</option>
-                <option value="30">30 minutes</option>
-                <option value="45">45 minutes</option>
-              </select>
-            </div>
-          </div>
-          <div className="px-4 pb-1 pt-4 flex flex-col gap-2">
-            <div className="font-semibold">Interview Type</div>
-            <div className="flex flex-wrap gap-3 ">
-              {data.map((d, i) => (
-                <button
-                  onClick={() => handleType(d.name)}
-                  key={i}
-                  className={`flex gap-1.5  px-5 cursor-pointer  text-sm justify-center items-center border-1 border-gray-400 rounded-xl  py-1 ${
-                    type.includes(d.name) && "text-blue-600"
-                  }`}
-                >
-                  <div>{d.icon}</div>
-                  <div>{d.name}s</div>
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex justify-end mt-3 pb-4 px-4">
-            <button
-              onClick={handleSubmit}
-              className="bg-blue-600 text-sm  flex items-center justify-center gap-2  text-white rounded-lg px-4 py-1.5"
-            >
-              <div>Generate Questions</div>
-              <div>
-                <FaArrowRightLong />
-              </div>
-            </button>
-            <button
-              onClick={handleFinish}
-              className="bg-blue-600 text-sm  flex items-center justify-center gap-2  text-white rounded-lg px-4 py-1.5"
-            >
-              <div>Finish</div>
-              <div>
-                <FaArrowRightLong />
-              </div>
-            </button>
+                <div>{d.icon}</div>
+                <div>{d.name}s</div>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Display Generated Questions */}
-        {question.length > 0 && (
-          <div className="mt-8 bg-white rounded-md p-4">
-            <h2 className="text-xl font-semibold mb-4">Generated Questions</h2>
-            <div className="space-y-4">
-              {question.map((q, index) => (
-                <div key={index} className="border-b pb-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                      {q.type}
-                    </span>
-                  </div>
-                  <p className="text-gray-800">{q.question}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Submit Button */}
+        <div className="flex justify-end mt-3 pb-4 px-4">
+          <button
+            onClick={handleSubmit}
+            className="bg-blue-600 text-sm flex items-center justify-center gap-2 text-white rounded-lg px-4 py-1.5"
+          >
+            <div>Create Interview</div>
+            <FaArrowRightLong />
+          </button>
+        </div>
       </div>
     </div>
   );
