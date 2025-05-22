@@ -23,7 +23,7 @@ model Question {
   jobposition    String
   jobdescription String
   duration       String
-  interviewtype  String
+  interviewtype  String[]  // Array of interview types
   question       Json
   userId         Int
   user           User     @relation(fields: [userId], references: [userId])

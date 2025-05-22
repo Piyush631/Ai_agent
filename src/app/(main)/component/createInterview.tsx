@@ -67,14 +67,48 @@ export default function CreateInterview({ step, setStep }: stepData) {
     GenerateQuestion();
   }
   async function handleFinish() {
-    const response = await axios.post("/api/generatequestion", {
-      jobpostion: formData.jobposition,
-      jobdescription: formData.jobdescription,
-      duration: formData.duration,
-      interviewType: formData.interviewType,
-      question: question,
-    });
+    console.log("hlo");
+    console.log(formData.jobposition);
+    console.log(formData.jobdescription);
+
+    if (
+      !formData.jobposition.trim() ||
+      !formData.jobdescription.trim() ||
+      !formData.duration ||
+      formData.interviewType.length === 0 ||
+      question.length === 0
+    ) {
+      let missingFields = [];
+      if (!formData.jobposition.trim()) missingFields.push("Job Position");
+      if (!formData.jobdescription.trim()) missingFields.push("Job Description");
+      if (!formData.duration) missingFields.push("Duration");
+      if (formData.interviewType.length === 0) missingFields.push("Interview Type");
+      if (question.length === 0) missingFields.push("Generated Questions");
+
+      alert(
+        `Please fill in all fields and generate questions before finishing.\nMissing fields: ${missingFields.join(", ")}`
+      );
+      return;
+    }
+
+    console.log("Submitting interview with:", formData);
+    console.log("question", question)
+    try {
+      const response = await axios.post("/api/generatequestion", {
+        jobposition: formData.jobposition,
+        jobdescription: formData.jobdescription,
+        duration: formData.duration,
+        interviewType: formData.interviewType,
+        question: question,
+        userId: 1,
+      });
+
+      console.log("Job post created:", response.data);
+    } catch (error) {
+      console.error("Failed to create job post:", error);
+    }
   }
+
   const GenerateQuestion = async () => {
     try {
       const result = await axios.post("/api/openai", { ...formData });
@@ -90,8 +124,6 @@ export default function CreateInterview({ step, setStep }: stepData) {
 
       const parsedData = JSON.parse(jsonString);
       const questions = parsedData.interviewQuestions;
-
-      console.log("Raw questions:", questions);
 
       if (Array.isArray(questions)) {
         setQuestion(questions);
@@ -133,6 +165,7 @@ export default function CreateInterview({ step, setStep }: stepData) {
                 type="text"
                 name="jobposition"
                 onChange={handleInputChange}
+                value={formData.jobposition}
                 className=" w-full  py-1.5  focus:outline-none  rounded-md border-1 border-gray-400 "
                 placeholder="e.g Full Stack Developer"
               />

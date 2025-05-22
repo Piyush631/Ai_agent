@@ -2134,7 +2134,6 @@ export namespace Prisma {
     jobposition: string | null
     jobdescription: string | null
     duration: string | null
-    interviewtype: string | null
     userId: number | null
   }
 
@@ -2143,7 +2142,6 @@ export namespace Prisma {
     jobposition: string | null
     jobdescription: string | null
     duration: string | null
-    interviewtype: string | null
     userId: number | null
   }
 
@@ -2174,7 +2172,6 @@ export namespace Prisma {
     jobposition?: true
     jobdescription?: true
     duration?: true
-    interviewtype?: true
     userId?: true
   }
 
@@ -2183,7 +2180,6 @@ export namespace Prisma {
     jobposition?: true
     jobdescription?: true
     duration?: true
-    interviewtype?: true
     userId?: true
   }
 
@@ -2289,7 +2285,7 @@ export namespace Prisma {
     jobposition: string
     jobdescription: string
     duration: string
-    interviewtype: string
+    interviewtype: string[]
     question: JsonValue
     userId: number
     _count: QuestionCountAggregateOutputType | null
@@ -2377,7 +2373,7 @@ export namespace Prisma {
       jobposition: string
       jobdescription: string
       duration: string
-      interviewtype: string
+      interviewtype: string[]
       question: Prisma.JsonValue
       userId: number
     }, ExtArgs["result"]["question"]>
@@ -2808,7 +2804,7 @@ export namespace Prisma {
     readonly jobposition: FieldRef<"Question", 'String'>
     readonly jobdescription: FieldRef<"Question", 'String'>
     readonly duration: FieldRef<"Question", 'String'>
-    readonly interviewtype: FieldRef<"Question", 'String'>
+    readonly interviewtype: FieldRef<"Question", 'String[]'>
     readonly question: FieldRef<"Question", 'Json'>
     readonly userId: FieldRef<"Question", 'Int'>
   }
@@ -3452,7 +3448,7 @@ export namespace Prisma {
     jobposition?: StringFilter<"Question"> | string
     jobdescription?: StringFilter<"Question"> | string
     duration?: StringFilter<"Question"> | string
-    interviewtype?: StringFilter<"Question"> | string
+    interviewtype?: StringNullableListFilter<"Question">
     question?: JsonFilter<"Question">
     userId?: IntFilter<"Question"> | number
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -3477,7 +3473,7 @@ export namespace Prisma {
     jobposition?: StringFilter<"Question"> | string
     jobdescription?: StringFilter<"Question"> | string
     duration?: StringFilter<"Question"> | string
-    interviewtype?: StringFilter<"Question"> | string
+    interviewtype?: StringNullableListFilter<"Question">
     question?: JsonFilter<"Question">
     userId?: IntFilter<"Question"> | number
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -3506,7 +3502,7 @@ export namespace Prisma {
     jobposition?: StringWithAggregatesFilter<"Question"> | string
     jobdescription?: StringWithAggregatesFilter<"Question"> | string
     duration?: StringWithAggregatesFilter<"Question"> | string
-    interviewtype?: StringWithAggregatesFilter<"Question"> | string
+    interviewtype?: StringNullableListFilter<"Question">
     question?: JsonWithAggregatesFilter<"Question">
     userId?: IntWithAggregatesFilter<"Question"> | number
   }
@@ -3579,7 +3575,7 @@ export namespace Prisma {
     jobposition: string
     jobdescription: string
     duration: string
-    interviewtype: string
+    interviewtype?: QuestionCreateinterviewtypeInput | string[]
     question: JsonNullValueInput | InputJsonValue
     user: UserCreateNestedOneWithoutQuestionsInput
   }
@@ -3589,7 +3585,7 @@ export namespace Prisma {
     jobposition: string
     jobdescription: string
     duration: string
-    interviewtype: string
+    interviewtype?: QuestionCreateinterviewtypeInput | string[]
     question: JsonNullValueInput | InputJsonValue
     userId: number
   }
@@ -3598,7 +3594,7 @@ export namespace Prisma {
     jobposition?: StringFieldUpdateOperationsInput | string
     jobdescription?: StringFieldUpdateOperationsInput | string
     duration?: StringFieldUpdateOperationsInput | string
-    interviewtype?: StringFieldUpdateOperationsInput | string
+    interviewtype?: QuestionUpdateinterviewtypeInput | string[]
     question?: JsonNullValueInput | InputJsonValue
     user?: UserUpdateOneRequiredWithoutQuestionsNestedInput
   }
@@ -3608,7 +3604,7 @@ export namespace Prisma {
     jobposition?: StringFieldUpdateOperationsInput | string
     jobdescription?: StringFieldUpdateOperationsInput | string
     duration?: StringFieldUpdateOperationsInput | string
-    interviewtype?: StringFieldUpdateOperationsInput | string
+    interviewtype?: QuestionUpdateinterviewtypeInput | string[]
     question?: JsonNullValueInput | InputJsonValue
     userId?: IntFieldUpdateOperationsInput | number
   }
@@ -3618,7 +3614,7 @@ export namespace Prisma {
     jobposition: string
     jobdescription: string
     duration: string
-    interviewtype: string
+    interviewtype?: QuestionCreateinterviewtypeInput | string[]
     question: JsonNullValueInput | InputJsonValue
     userId: number
   }
@@ -3627,7 +3623,7 @@ export namespace Prisma {
     jobposition?: StringFieldUpdateOperationsInput | string
     jobdescription?: StringFieldUpdateOperationsInput | string
     duration?: StringFieldUpdateOperationsInput | string
-    interviewtype?: StringFieldUpdateOperationsInput | string
+    interviewtype?: QuestionUpdateinterviewtypeInput | string[]
     question?: JsonNullValueInput | InputJsonValue
   }
 
@@ -3636,7 +3632,7 @@ export namespace Prisma {
     jobposition?: StringFieldUpdateOperationsInput | string
     jobdescription?: StringFieldUpdateOperationsInput | string
     duration?: StringFieldUpdateOperationsInput | string
-    interviewtype?: StringFieldUpdateOperationsInput | string
+    interviewtype?: QuestionUpdateinterviewtypeInput | string[]
     question?: JsonNullValueInput | InputJsonValue
     userId?: IntFieldUpdateOperationsInput | number
   }
@@ -3800,6 +3796,14 @@ export namespace Prisma {
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
+
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -3849,7 +3853,6 @@ export namespace Prisma {
     jobposition?: SortOrder
     jobdescription?: SortOrder
     duration?: SortOrder
-    interviewtype?: SortOrder
     userId?: SortOrder
   }
 
@@ -3858,7 +3861,6 @@ export namespace Prisma {
     jobposition?: SortOrder
     jobdescription?: SortOrder
     duration?: SortOrder
-    interviewtype?: SortOrder
     userId?: SortOrder
   }
 
@@ -3955,10 +3957,19 @@ export namespace Prisma {
     deleteMany?: QuestionScalarWhereInput | QuestionScalarWhereInput[]
   }
 
+  export type QuestionCreateinterviewtypeInput = {
+    set: string[]
+  }
+
   export type UserCreateNestedOneWithoutQuestionsInput = {
     create?: XOR<UserCreateWithoutQuestionsInput, UserUncheckedCreateWithoutQuestionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutQuestionsInput
     connect?: UserWhereUniqueInput
+  }
+
+  export type QuestionUpdateinterviewtypeInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type UserUpdateOneRequiredWithoutQuestionsNestedInput = {
@@ -4126,7 +4137,7 @@ export namespace Prisma {
     jobposition: string
     jobdescription: string
     duration: string
-    interviewtype: string
+    interviewtype?: QuestionCreateinterviewtypeInput | string[]
     question: JsonNullValueInput | InputJsonValue
   }
 
@@ -4135,7 +4146,7 @@ export namespace Prisma {
     jobposition: string
     jobdescription: string
     duration: string
-    interviewtype: string
+    interviewtype?: QuestionCreateinterviewtypeInput | string[]
     question: JsonNullValueInput | InputJsonValue
   }
 
@@ -4173,7 +4184,7 @@ export namespace Prisma {
     jobposition?: StringFilter<"Question"> | string
     jobdescription?: StringFilter<"Question"> | string
     duration?: StringFilter<"Question"> | string
-    interviewtype?: StringFilter<"Question"> | string
+    interviewtype?: StringNullableListFilter<"Question">
     question?: JsonFilter<"Question">
     userId?: IntFilter<"Question"> | number
   }
@@ -4233,7 +4244,7 @@ export namespace Prisma {
     jobposition: string
     jobdescription: string
     duration: string
-    interviewtype: string
+    interviewtype?: QuestionCreateinterviewtypeInput | string[]
     question: JsonNullValueInput | InputJsonValue
   }
 
@@ -4241,7 +4252,7 @@ export namespace Prisma {
     jobposition?: StringFieldUpdateOperationsInput | string
     jobdescription?: StringFieldUpdateOperationsInput | string
     duration?: StringFieldUpdateOperationsInput | string
-    interviewtype?: StringFieldUpdateOperationsInput | string
+    interviewtype?: QuestionUpdateinterviewtypeInput | string[]
     question?: JsonNullValueInput | InputJsonValue
   }
 
@@ -4250,7 +4261,7 @@ export namespace Prisma {
     jobposition?: StringFieldUpdateOperationsInput | string
     jobdescription?: StringFieldUpdateOperationsInput | string
     duration?: StringFieldUpdateOperationsInput | string
-    interviewtype?: StringFieldUpdateOperationsInput | string
+    interviewtype?: QuestionUpdateinterviewtypeInput | string[]
     question?: JsonNullValueInput | InputJsonValue
   }
 
@@ -4259,7 +4270,7 @@ export namespace Prisma {
     jobposition?: StringFieldUpdateOperationsInput | string
     jobdescription?: StringFieldUpdateOperationsInput | string
     duration?: StringFieldUpdateOperationsInput | string
-    interviewtype?: StringFieldUpdateOperationsInput | string
+    interviewtype?: QuestionUpdateinterviewtypeInput | string[]
     question?: JsonNullValueInput | InputJsonValue
   }
 
