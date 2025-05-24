@@ -1,27 +1,46 @@
 "use client";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaRegClock } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { setQuestion } from "@/app/store/slice/questionSlice";
 
 export default function Interview() {
   const params = useParams();
-  const interviewId = params.interviewId; 
-  console.log(interviewId);
+  const interviewId = params.interviewId;
+  const [interviewData, setInterviewData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const job = useSelector((state: RootState) => state.question);
+const dispatch=useDispatch()
   useEffect(() => {
     fetchData();
   }, []);
 
   async function fetchData() {
     try {
+      setLoading(true);
       const response = await axios.get(
-        `api/generatequestion/${interviewId}`
+        `/api/generatequestion/${interviewId}`
       );
-      console.log(response.data);
-      console.log("Fetching data for interview ID:", interviewId);
-    } catch (error) {
+      setInterviewData(response.data);
+      dispatch(setQuestion(response.data))
+      setError(null);
+    } catch (error: any) {
       console.error("Error fetching interview data:", error);
+      setError(error.response?.data?.error?.message || "Failed to fetch interview data");
+    } finally {
+      setLoading(false);
     }
+  }
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
   }
 
   return (
@@ -37,10 +56,10 @@ export default function Interview() {
         </div>
 
         <div className="w-full flex flex-col items-center gap-1 justify-center">
-          <div className="text-xl font-semibold">Full Stack Web Developer</div>
+          <div className="text-xl font-semibold">{interviewData?.jobposition || 'Loading...'}</div>
           <div className="flex items-center gap-1">
             <FaRegClock />
-            <div>30 minutes</div>
+            <div>{interviewData?.duration || 'Loading...'}{" "}minutes</div>
           </div>
         </div>
 

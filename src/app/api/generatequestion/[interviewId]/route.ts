@@ -6,7 +6,7 @@ export async function GET(
   context: { params: { interviewId: string } }
 ) {
   const interviewId = Number(context.params.interviewId);
-
+  
   if (isNaN(interviewId)) {
     return NextResponse.json(
       { error: "Invalid interview ID" },
@@ -15,19 +15,28 @@ export async function GET(
   }
 
   try {
-    const response = await prisma.question.findUnique({
+    const interview = await prisma.question.findUnique({
       where: { id: interviewId },
+      select: {
+        id: true,
+        jobposition: true,
+        jobdescription: true,
+        duration: true,
+        interviewtype: true,
+        question: true
+      }
     });
 
-    if (!response) {
+    if (!interview) {
       return NextResponse.json(
-        { error: "Question not found" },
+        { error: "Interview not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(response);
+    return NextResponse.json(interview);
   } catch (error: any) {
+    console.error("Database error:", error);
     return NextResponse.json(
       {
         error: {
