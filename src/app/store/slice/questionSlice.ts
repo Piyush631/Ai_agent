@@ -1,29 +1,38 @@
-import { createSlice ,PayloadAction} from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface QuestionState{
-    jobposition:String
-  jobdescription:String
-  duration:String
-  interviewtype:String[]  
-  question:any
-  userId:number
-
+interface QuestionState {
+    jobposition: string
+    jobdescription: string
+    duration: string
+    interviewtype: string[]  
+    question: any
+    userId: number
 }
-const initialState:QuestionState={
-    jobposition:"",
-    jobdescription:"",
-    duration:"",
-    interviewtype:[],
-    question:[],
-    userId:0
-    
 
+const initialState: QuestionState = {
+    jobposition: "",
+    jobdescription: "",
+    duration: "",
+    interviewtype: [],
+    question: [],
+    userId: 0
 }
-const questionSlice=createSlice({
-    name:"question",
+
+const questionSlice = createSlice({
+    name: "question",
     initialState,
-    reducers:{
-                
+    reducers: {
+        setQuestion: (state, action: PayloadAction<QuestionState>) => {
+            state.jobposition = action.payload.jobposition;
+            state.jobdescription = action.payload.jobdescription;
+            state.duration = action.payload.duration;
+            state.interviewtype = action.payload.interviewtype;
+            state.question = action.payload.question;
+            state.userId = action.payload.userId;
+        }    
     }
 })
+
+export const { setQuestion } = questionSlice.actions
+export default questionSlice.reducer
 

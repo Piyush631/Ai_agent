@@ -1,10 +1,11 @@
 "use client";
 import axios from "axios";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaRegClock } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { setQuestion } from "@/app/store/slice/questionSlice";
+import { RootState } from "@/app/store/appStore";
 
 export default function Interview() {
   const params = useParams();
@@ -12,35 +13,53 @@ export default function Interview() {
   const [interviewData, setInterviewData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch();
   const job = useSelector((state: RootState) => state.question);
-const dispatch=useDispatch()
+  const router = useRouter();
   useEffect(() => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    console.log("Redux State Updated:", job);
+  }, [job]);
+
+  async function handleSubmit() {
+    const response = await axios.get(`/api/generatequestion/${interviewId}`);
+    dispatch(setQuestion(response.data));
+    router.push(`interview/${interviewId}/start`);
+  }
   async function fetchData() {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `/api/generatequestion/${interviewId}`
-      );
+      const response = await axios.get(`/api/generatequestion/${interviewId}`);
       setInterviewData(response.data);
-      dispatch(setQuestion(response.data))
+
       setError(null);
     } catch (error: any) {
       console.error("Error fetching interview data:", error);
-      setError(error.response?.data?.error?.message || "Failed to fetch interview data");
+      setError(
+        error.response?.data?.error?.message || "Failed to fetch interview data"
+      );
     } finally {
       setLoading(false);
     }
   }
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
+    return (
+      <div className="flex justify-center items-center h-screen text-red-500">
+        {error}
+      </div>
+    );
   }
 
   return (
@@ -56,10 +75,12 @@ const dispatch=useDispatch()
         </div>
 
         <div className="w-full flex flex-col items-center gap-1 justify-center">
-          <div className="text-xl font-semibold">{interviewData?.jobposition || 'Loading...'}</div>
+          <div className="text-xl font-semibold">
+            {interviewData?.jobposition || "Loading..."}
+          </div>
           <div className="flex items-center gap-1">
             <FaRegClock />
-            <div>{interviewData?.duration || 'Loading...'}{" "}minutes</div>
+            <div>{interviewData?.duration || "Loading..."} minutes</div>
           </div>
         </div>
 
@@ -76,6 +97,7 @@ const dispatch=useDispatch()
 
         <div className="lg:mt-2 mt-4 mx-auto w-80 py-2 text-sm pl-4 bg-blue-100">
           <div className="text-blue-700 font-semibold">Before you begin</div>
+
           <ul className="list-disc list-inside flex flex-col gap-0.5 mt-1 text-blue-700">
             <li>Ensure you have a stable internet connection</li>
             <li>Test your camera and microphone</li>
@@ -84,7 +106,10 @@ const dispatch=useDispatch()
         </div>
 
         <div className="w-full flex justify-center lg:mt-2 mt-4">
-          <button className="bg-blue-700 w-1/2 text-white rounded-md py-1">
+          <button
+            onClick={handleSubmit}
+            className="bg-blue-700 w-1/2 text-white rounded-md py-1"
+          >
             Join Interview
           </button>
         </div>
