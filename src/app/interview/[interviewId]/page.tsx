@@ -37,7 +37,6 @@ export default function Interview() {
 
       setError(null);
     } catch (error: any) {
-      console.error("Error fetching interview data:", error);
       setError(
         error.response?.data?.error?.message || "Failed to fetch interview data"
       );
