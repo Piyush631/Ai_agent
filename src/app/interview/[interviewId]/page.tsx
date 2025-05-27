@@ -27,7 +27,7 @@ export default function Interview() {
   async function handleSubmit() {
     const response = await axios.get(`/api/generatequestion/${interviewId}`);
     dispatch(setQuestion(response.data));
-    router.push(`interview/${interviewId}/start`);
+    router.push(`/interview/${interviewId}/start`);
   }
   async function fetchData() {
     try {
