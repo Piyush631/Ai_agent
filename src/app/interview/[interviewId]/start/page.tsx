@@ -10,24 +10,22 @@ import { useEffect } from "react";
 export default function StartInterview() {
   const job = useSelector((state: RootState) => state.question);
   const question = job?.question;
-  const vapi = new Vapi("ba93387e-dd58-46ae-bdce-75702895b305");
+  
+ const api="ba93387e-dd58-46ae-bdce-75702895b305"
+ 
+  const vapi = new Vapi(api);
 
   useEffect(() => {
     if (job) {
       console.log("Starting interview...");
-      startCall();
+      start();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [job]);
 
-  const startCall = async () => {
-    console.log("enter");
-    console.log(question);
-
+  const start = async () => {
     const questionList =
-      question?.map((item: { question: string }) => item.question).join(", ") ??
-      "";
-
+      question?.map((item: { question: string }) => item.question).join(", ") ?? "";
+  
     const assistantOptions = {
       name: "AI Recruiter",
       firstMessage: `Hi Piyush, how are you? Ready for your interview on ${job?.jobposition}?`,
@@ -36,49 +34,39 @@ export default function StartInterview() {
         model: "nova-2" as const,
         language: "en-US" as const
       },
-      tts: {
+      voice: {
         provider: "playht" as const,
         voiceId: "jennifer" as const,
       },
       model: {
         provider: "openai" as const,
-        model: "gpt-4o" as const,
+        model: "gpt-4" as const,
         messages: [
           {
             role: "system" as const,
             content: `
-You are an AI voice assistant conducting interviews.
-Your job is to ask candidates provided interview questions, assess their responses.
-Begin the conversation with a friendly introduction, setting a relaxed yet professional tone. Example:
-"Hey there! Welcome to your ${job?.jobposition} interview. Let's get started with a few questions!"
-Ask one question at a time and wait for the candidate's response before proceeding. Keep the questions clear and concise. Below are the questions to ask one by one:
-Questions: ${questionList}
-If the candidate struggles, offer hints or rephrase the question without giving away the answer. Example:
-"Need a hint? Think about how React tracks component updates!"
-Provide brief, encouraging feedback after each answer. Example:
-"Nice! That was solid. Ready to try again?"
-Keep the conversation natural and engaging—use casual phrases like "Alright, next up…" or "Let's tackle a tricky one!"
-After 5–7 questions, wrap up the interview smoothly by summarizing their performance. Example:
-"That was great! You handled some tough questions well. Keep sharpening your skills!"
-End with a positive note:
-"Thanks for chatting! Hope to see you crushing projects soon!"
-Key Guidelines:
-✅ Be friendly, engaging, and witty
-✅ Keep responses short and natural, like a real conversation
-✅ Adapt based on the candidate's confidence level
-✅ Ensure the interview remains focused on React
-          `.trim(),
+  You are an AI voice assistant conducting interviews...
+  (Your prompt continues here)
+            `.trim(),
           },
         ],
       },
     };
-
+  
+    console.log("start");
+    console.log(assistantOptions);
+  
     try {
-      await vapi.start(assistantOptions);
-    } catch (error) {
-      console.error('Vapi error:', error);
+      vapi.start(assistantOptions);
+    } catch (err) {
+      console.error("Error starting assistant:", err);
     }
   };
+  
+
+  async function handleStop() {
+    vapi.stop();
+  }
 
   return (
     <div className="h-screen w-full bg-black text-white">
@@ -119,7 +107,7 @@ Key Guidelines:
             </div>
           </div>
           <div className="h-10 w-10 bg-red-600 flex items-center justify-center rounded-full">
-            <div className="text-white text-xl">
+            <div onClick={handleStop} className="text-white text-xl">
               <IoCall />
             </div>
           </div>
