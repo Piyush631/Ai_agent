@@ -13,6 +13,7 @@ export default function Interview() {
   const [interviewData, setInterviewData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [name, setName] = useState("");
   const dispatch = useDispatch();
   const job = useSelector((state: RootState) => state.question);
   const router = useRouter();
@@ -25,8 +26,12 @@ export default function Interview() {
   }, [job]);
 
   async function handleSubmit() {
+    if (!name.trim()) {
+      alert("Please enter your name");
+      return;
+    }
     const response = await axios.get(`/api/generatequestion/${interviewId}`);
-    dispatch(setQuestion(response.data));
+    dispatch(setQuestion({...response.data, candidateName: name}));
     router.push(`/interview/${interviewId}/start`);
   }
   async function fetchData() {
@@ -90,6 +95,8 @@ export default function Interview() {
               className="w-full border-1 rounded-lg border-gray-400 py-1.5"
               type="text"
               placeholder="e.g john"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
         </div>

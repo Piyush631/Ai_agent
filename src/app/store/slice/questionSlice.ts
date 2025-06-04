@@ -7,6 +7,7 @@ interface QuestionState {
     interviewtype: string[]  
     question: any
     userId: number
+    candidateName:string
 }
 
 const initialState: QuestionState = {
@@ -15,7 +16,8 @@ const initialState: QuestionState = {
     duration: "",
     interviewtype: [],
     question: [],
-    userId: 0
+    userId: 0,
+    candidateName: ""
 }
 
 const questionSlice = createSlice({
@@ -29,6 +31,7 @@ const questionSlice = createSlice({
             state.interviewtype = action.payload.interviewtype;
             state.question = action.payload.question;
             state.userId = action.payload.userId;
+            state.candidateName = action.payload.candidateName;
         }    
     }
 })

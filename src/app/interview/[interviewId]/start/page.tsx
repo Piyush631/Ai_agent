@@ -10,9 +10,10 @@ import { useEffect } from "react";
 export default function StartInterview() {
   const job = useSelector((state: RootState) => state.question);
   const question = job?.question;
+  const candidateName = job?.candidateName;
   
- const api="ba93387e-dd58-46ae-bdce-75702895b305"
- 
+  const api="ba93387e-dd58-46ae-bdce-75702895b305"
+  
   const vapi = new Vapi(api);
 
   useEffect(() => {
@@ -25,10 +26,10 @@ export default function StartInterview() {
   const start = async () => {
     const questionList =
       question?.map((item: { question: string }) => item.question).join(", ") ?? "";
-  
+    console.log(questionList)
     const assistantOptions = {
       name: "AI Recruiter",
-      firstMessage: `Hi Piyush, how are you? Ready for your interview on ${job?.jobposition}?`,
+      firstMessage: `Hi ${candidateName}, how are you? Ready for your interview on ${job?.jobposition}?`,
       transcriber: {
         provider: "deepgram" as const,
         model: "nova-2" as const,
@@ -46,15 +47,38 @@ export default function StartInterview() {
             role: "system" as const,
             content: `
   You are an AI voice assistant conducting interviews...
-  (Your prompt continues here)
+ Your job is to ask candidates provided interview questions, assess their responses.
+Begin the conversation with a friendly introduction, setting a relaxed yet professional tone. Example:
+"Hey there ${candidateName}! Welcome to your ${job?.jobposition} interview. Let's get started with a few questions!"
+
+Ask one question at a time and wait for the candidate's response before proceeding. Keep the questions clear and concise. Below Are the questions; ask one by one:
+Questions: ${questionList}
+
+If the candidate struggles, offer hints or rephrase the question without giving away the answer. Example:
+"Need a hint? Think about how React tracks component updates!"
+
+Provide brief, encouraging feedback after each answer. Example:
+"Nice! That's a solid answer."
+"Hmm, not quite? Want to try again?"
+
+Keep the conversation natural and engaging—use casual phrases like "Alright, next up..." or "Let's tackle a tricky one!"
+
+After 5-7 questions, wrap up the interview smoothly by summarizing their performance. Example:
+"That was great! You handled some tough questions well. Keep sharpening your skills!"
+
+End on a positive note:
+"Thanks for chatting! Hope to see you crushing projects soon!"
+Key Guidelines:
+✅ Be friendly, engaging, and witty 😄
+✅ Keep responses short and natural, like a real conversation
+✅ Adapt based on the candidate's confidence level
+✅ Ensure the interview remains focused on React
+
             `.trim(),
           },
         ],
       },
     };
-  
-    console.log("start");
-    console.log(assistantOptions);
   
     try {
       vapi.start(assistantOptions);
