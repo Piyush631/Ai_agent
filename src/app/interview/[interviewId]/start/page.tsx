@@ -5,15 +5,16 @@ import { FaRegClock } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/store/appStore";
 import Vapi from "@vapi-ai/web";
-import { useEffect } from "react";
-
+import { useEffect, useState } from "react";
+import Popup from "@/app/component/popup";
+import { useRouter } from "next/navigation";
 export default function StartInterview() {
   const job = useSelector((state: RootState) => state.question);
   const question = job?.question;
   const candidateName = job?.candidateName;
-  
-  const api="ba93387e-dd58-46ae-bdce-75702895b305"
-  
+  const [isPopup, setIsPopup] = useState(false);
+  const api = "ba93387e-dd58-46ae-bdce-75702895b305";
+  const router = useRouter();
   const vapi = new Vapi(api);
 
   useEffect(() => {
@@ -25,15 +26,15 @@ export default function StartInterview() {
 
   const start = async () => {
     const questionList =
-      question?.map((item: { question: string }) => item.question).join(", ") ?? "";
-    console.log(questionList)
+      question?.map((item: { question: string }) => item.question).join(", ") ??
+      "";
     const assistantOptions = {
       name: "AI Recruiter",
       firstMessage: `Hi ${candidateName}, how are you? Ready for your interview on ${job?.jobposition}?`,
       transcriber: {
         provider: "deepgram" as const,
         model: "nova-2" as const,
-        language: "en-US" as const
+        language: "en-US" as const,
       },
       voice: {
         provider: "playht" as const,
@@ -79,17 +80,16 @@ Key Guidelines:
         ],
       },
     };
-  
+
     try {
-      vapi.start(assistantOptions);
+      // vapi.start(assistantOptions);
     } catch (err) {
       console.error("Error starting assistant:", err);
     }
   };
-  
 
   async function handleStop() {
-    vapi.stop();
+    setIsPopup(true);
   }
 
   return (
@@ -107,19 +107,28 @@ Key Guidelines:
         <div className="flex justify-between gap-4 mt-4">
           <div className="h-56 md:h-72 w-full md:w-1/2 border border-white/60 rounded-md">
             <div className="flex h-full flex-col justify-center gap-2 items-center">
-              <img
-                src="/ai.jpeg"
-                className="h-16 w-16 rounded-full object-cover"
-                alt="Success"
-              />
+              <div className="relative">
+                <span className="absolute inset-0 rounded-full bg-blue-500 opactity-75 animate-ping" />
+                <img
+                  src="/ai.jpeg"
+                  className="h-16 w-16 rounded-full object-cover"
+                  alt="Success"
+                />
+                <div />
+              </div>
               <div>AI Recruiter</div>
             </div>
           </div>
           <div className="h-56 md:h-72 w-full md:w-1/2 border border-white/60 rounded-md">
             <div className="flex h-full flex-col justify-center gap-2 items-center">
-              <div className="h-16 w-16 flex items-center justify-center rounded-full bg-blue-500">
-                <div>P</div>
+              <div className="absolute">
+                <span className="absolute inset-0 rounded-full bg-blue-500 opactity-75 animate-ping" />
+
+                <div className="h-16 w-16 flex items-center justify-center rounded-full bg-blue-500">
+                  <div>{candidateName?.[0]?.toUpperCase()} </div>
+                </div>
               </div>
+
               <div>You</div>
             </div>
           </div>
@@ -138,6 +147,24 @@ Key Guidelines:
         </div>
         <div className="text-center">Interview in Progress</div>
       </div>
+      {isPopup && (
+        <div className=" fixed inset-0 flex  items-center justify-center z-50">
+          <Popup
+            heading="Are you absolutely sure?"
+            subheading="This action cannot be undone.Your interview will end"
+            firstButtonText="Cancel"
+            secondButtonText="Continue"
+            onClose={() => {
+              setIsPopup(false);
+            }}
+            onSubmit={() => {
+              setIsPopup(false);
+              vapi.stop();
+              router.push("/");
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
