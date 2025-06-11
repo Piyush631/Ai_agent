@@ -8,11 +8,14 @@ import Vapi from "@vapi-ai/web";
 import { useEffect, useState } from "react";
 import Popup from "@/app/component/popup";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 export default function StartInterview() {
   const job = useSelector((state: RootState) => state.question);
   const question = job?.question;
   const candidateName = job?.candidateName;
   const [isPopup, setIsPopup] = useState(false);
+  const [activeUser, setActiveUser] = useState(false);
+  const [conversation, setConversation] = useState();
   const api = "ba93387e-dd58-46ae-bdce-75702895b305";
   const router = useRouter();
   const vapi = new Vapi(api);
@@ -87,11 +90,35 @@ Key Guidelines:
       console.error("Error starting assistant:", err);
     }
   };
-
+  vapi.on("call-start", () => console.log("Call started"));
+  vapi.on("call-end", () => console.log("Call ended"));
+  vapi.on("speech-start", () => {
+    console.log("speech start");
+    setActiveUser(true);
+  });
+  vapi.on("speech-end", () => {
+    console.log("speech end");
+    setActiveUser(false);
+  });
+  vapi.on("message", (message) => {
+    console.log(message?.conversation);
+    setConversation(message?.conversation);
+  });
+  vapi.on("call-end", () => {
+    console.log("call end");
+    GenerateFeedback();
+  });
   async function handleStop() {
     setIsPopup(true);
   }
-
+  async function GenerateFeedback() {
+    const result = await axios.post("/api/feedback");
+    {
+      conversation: conversation;
+    }
+    const content = result.data.content;
+    const Final = content.replace("```json", "").replace("```", "");
+  }
   return (
     <div className="h-screen w-full bg-black text-white">
       <div className="w-full md:w-2/3 mx-auto px-8 pt-24 ">
@@ -108,7 +135,9 @@ Key Guidelines:
           <div className="h-56 md:h-72 w-full md:w-1/2 border border-white/60 rounded-md">
             <div className="flex h-full flex-col justify-center gap-2 items-center">
               <div className="relative">
-                <span className="absolute inset-0 rounded-full bg-blue-500 opactity-75 animate-ping" />
+                {activeUser && (
+                  <span className="absolute inset-0 rounded-full bg-blue-500 opactity-75 animate-ping" />
+                )}
                 <img
                   src="/ai.jpeg"
                   className="h-16 w-16 rounded-full object-cover"
@@ -122,7 +151,9 @@ Key Guidelines:
           <div className="h-56 md:h-72 w-full md:w-1/2 border border-white/60 rounded-md">
             <div className="flex h-full flex-col justify-center gap-2 items-center">
               <div className="absolute">
-                <span className="absolute inset-0 rounded-full bg-blue-500 opactity-75 animate-ping" />
+                {!activeUser && (
+                  <span className="absolute inset-0 rounded-full bg-blue-500 opactity-75 animate-ping" />
+                )}
 
                 <div className="h-16 w-16 flex items-center justify-center rounded-full bg-blue-500">
                   <div>{candidateName?.[0]?.toUpperCase()} </div>

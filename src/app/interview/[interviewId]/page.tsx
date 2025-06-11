@@ -14,6 +14,7 @@ export default function Interview() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const dispatch = useDispatch();
   const job = useSelector((state: RootState) => state.question);
   const router = useRouter();
@@ -31,7 +32,13 @@ export default function Interview() {
       return;
     }
     const response = await axios.get(`/api/generatequestion/${interviewId}`);
-    dispatch(setQuestion({...response.data, candidateName: name}));
+    dispatch(
+      setQuestion({
+        ...response.data,
+        candidateName: name,
+        candidateEmail: email,
+      })
+    );
     router.push(`/interview/${interviewId}/start`);
   }
   async function fetchData() {
@@ -97,6 +104,16 @@ export default function Interview() {
               placeholder="e.g john"
               value={name}
               onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col w-full lg:gap-1 gap-3 lg:px-40 md:px-32 px-10">
+            <label>Enter your Email </label>
+            <input
+              className="w-full border-1 rounded-lg border-gray-400 py-1.5"
+              type="text"
+              placeholder="Enter your Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
         </div>
