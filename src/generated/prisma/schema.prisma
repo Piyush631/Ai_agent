@@ -19,12 +19,22 @@ model User {
 }
 
 model Question {
-  id             Int      @id @default(autoincrement())
+  id             Int        @id @default(autoincrement())
   jobposition    String
   jobdescription String
   duration       String
   interviewtype  String[] // Array of interview types
   question       Json
   userId         Int
-  user           User     @relation(fields: [userId], references: [userId])
+  user           User       @relation(fields: [userId], references: [userId])
+  feedbacks      Feedback[]
+}
+
+model Feedback {
+  id          Int      @id @default(autoincrement())
+  username    String
+  email       String
+  feedback    Json
+  interviewId Int
+  question    Question @relation(fields: [interviewId], references: [id])
 }

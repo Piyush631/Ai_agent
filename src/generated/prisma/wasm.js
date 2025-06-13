@@ -139,6 +139,14 @@ exports.Prisma.QuestionScalarFieldEnum = {
   userId: 'userId'
 };
 
+exports.Prisma.FeedbackScalarFieldEnum = {
+  id: 'id',
+  username: 'username',
+  email: 'email',
+  feedback: 'feedback',
+  interviewId: 'interviewId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -167,7 +175,8 @@ exports.Prisma.JsonNullValueFilter = {
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Question: 'Question'
+  Question: 'Question',
+  Feedback: 'Feedback'
 };
 
 /**

@@ -27,4 +27,15 @@ model Question {
   question       Json
   userId         Int
   user           User     @relation(fields: [userId], references: [userId])
+  feedbacks       Feedback[]
+}
+
+model Feedback{
+  id      Int @id @default(autoincrement())
+  username  String
+  email     String
+  feedback  Json
+  interviewId Int
+  question    Question @relation(fields:[interviewId],references: [id])
+
 }
