@@ -13,9 +13,9 @@ export default function interviewFinished() {
           </div>
           <img src="/finish.png" className="h-72"></img>
         </div>
-        <div className="w-2/3 border-1 gap-1 py-4 rounded-md border-gray-200 mx-auto flex flex-col justify-center items-center">
+        <div className="w-2/3 border-1 gap-2 py-4 rounded-md border-gray-200 mx-auto flex flex-col justify-center items-center">
           <div className="font-semibold">What's Next?</div>
-          <div className="text-sm text-center">
+          <div className="text-sm text-center text-gray-400">
             The recruiter will review your interview responses and will contact
             you soon regarding the next step{" "}
           </div>
@@ -23,7 +23,9 @@ export default function interviewFinished() {
             <div>
               <MdOutlineWatchLater />
             </div>
-            <div>Resposne within 2-3 business days</div>
+            <div className="text-gray-400 text-sm text-center">
+              Resposne within 2-3 business days
+            </div>
           </div>
         </div>
       </div>
