@@ -55,8 +55,8 @@ function Sidebar({
     <div
       className={`
         h-full pt-4 bg-gray-100 transition-all duration-300 fixed md:static z-40
-        ${open ? "w-60" : "w-16"}
-        ${open ? "left-0" : "-left-60"}
+        ${open ? "w-64" : "w-16"}
+        ${open ? "left-0" : "-left-64"}
         md:left-0
         top-0
         md:h-auto
