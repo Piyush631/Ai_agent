@@ -1,6 +1,6 @@
 export default function Feedback() {
   return (
-    <div className="h-screen w-full p-6">
+    <div className=" w-full p-6">
       <div className="flex justify-between w-full py-2 px-8 bg-gray-100 ">
         <div className="flex items-center gap-2">
           <div className="h-12 w-12 rounded-full bg-blue-200"></div>
@@ -15,9 +15,9 @@ export default function Feedback() {
           </div>
         </div>
       </div>
-      <div className="my-2">
-        <div className="pt-2 font-semibold text-2xl">Skills Assessment</div>
-        <div className=" w-full  gap-4 flex justify-between flex-wrap">
+      <div className="my-3">
+        <div className="pt-2  font-semibold text-2xl">Skills Assessment</div>
+        <div className=" mt-3 w-full  gap-4 flex justify-between flex-wrap">
           <div className="py-2 flex flex-col gap-1 w-[478px] ">
             <div className="flex justify-between">
               <div className="font-semibold">Technical Skills</div>
@@ -55,14 +55,31 @@ export default function Feedback() {
         </div>
       </div>
       <div className="my-2">
-        <div className=" pt-2 text-xl font-semibold">Performance Summary</div>
-        <div className="px-3 py-3 text-gray-600">
+        <div className=" pt-2 mt-2 text-xl font-semibold">
+          Performance Summary
+        </div>
+        <div className="px-3 py-3 bg-gray-300 my-3  rounded-md  text-gray-600">
           Lorem Ipsum is simply dummy text of the printing and typesetting
           industry. Lorem Ipsum has been the industry's standard dummy text ever
           since the 1500s, when an unknown printer took a galley of type and
           scrambled it to make a type specimen book. It has survived not only
           five centuries, but also the leap into electronic typesetting,
           remaining essentially unchanged.
+        </div>
+      </div>
+      <div className="w-full my-4 h-32  md:h-24 rounded-md bg-green-200  gap-3 md:gap-0 flex flex-col md:flex-row  p-3 justify-between">
+        <div className="flex flex-col justify-between">
+          <div className="text-green-700 text-md  md:text-xl font-semibold">
+            Recommended for Hire
+          </div>
+          <div className="text-green-600">
+            Candidate show Strong Potential and matches our requirements
+          </div>
+        </div>
+        <div className="flex flex-col justify-center items-center">
+          <button className="py-1 w-36 md:w-40 text-sm md:text-lg  text-white bg-green-800 rounded-md">
+            Proceed to Offers{" "}
+          </button>
         </div>
       </div>
     </div>
