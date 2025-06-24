@@ -62,9 +62,7 @@ export default function Feedback() {
           Lorem Ipsum is simply dummy text of the printing and typesetting
           industry. Lorem Ipsum has been the industry's standard dummy text ever
           since the 1500s, when an unknown printer took a galley of type and
-          scrambled it to make a type specimen book. It has survived not only
-          five centuries, but also the leap into electronic typesetting,
-          remaining essentially unchanged.xcv
+          scrambled it to make a type specimen book.
         </div>
       </div>
       <div className="w-full my-4 h-32  md:h-24 rounded-md bg-green-200  gap-3 md:gap-0 flex flex-col md:flex-row  p-3 justify-between">
