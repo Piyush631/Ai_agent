@@ -9,7 +9,7 @@ export default function interviewFinished() {
           <div className="font-semibold text-2xl">Interview Complete!</div>
           <div className="text-gray-400">
             Thank you for the participating in the AI-driven Interview with
-            AIrecuriter
+            AIrecuriter!!
           </div>
           <img src="/finish.png" className="h-72"></img>
         </div>
