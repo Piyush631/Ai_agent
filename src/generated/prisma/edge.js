@@ -161,7 +161,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/piyushchoudhary/Documents/aiAgent/Ai_agent/src/generated/prisma",
+      "value": "/Users/piyushchoudhary/personal project/Ai_agent/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -175,11 +175,12 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/piyushchoudhary/Documents/aiAgent/Ai_agent/prisma/schema.prisma",
+    "sourceFilePath": "/Users/piyushchoudhary/personal project/Ai_agent/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null
+    "rootEnvPath": null,
+    "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
   "clientVersion": "6.7.0",
@@ -188,12 +189,11 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": null
+        "value": "postgresql://postgres:piyush@localhost:5432/testdb2"
       }
     }
   },

@@ -60,3 +60,12 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export async function GET() {
+  try {
+     const response =await prisma.question.findMany();
+     return NextResponse.json(response, { status: 200 });
+    }
+   catch (error) {
+    return NextResponse.json({ msg: `faild to get interview details ${error}` }, { status: 402 });
+  }
+}

@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  context: { params: { interviewId: string } }
+  context: { params: Promise<{ interviewId: string }> }
 ) {
-  const interviewId = Number(context.params.interviewId);
+  const params = await context.params;
+  const interviewId = Number(params.interviewId);
 
   if (isNaN(interviewId)) {
     return NextResponse.json(

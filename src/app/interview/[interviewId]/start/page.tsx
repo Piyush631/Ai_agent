@@ -7,25 +7,83 @@ import { RootState } from "@/app/store/appStore";
 import Vapi from "@vapi-ai/web";
 import { useEffect, useState } from "react";
 import Popup from "@/app/component/popup";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 export default function StartInterview() {
   const job = useSelector((state: RootState) => state.question);
   const question = job?.question;
   const candidateName = job?.candidateName;
+  const email = job?.candidateEmail;
+  const {interviewId}=useParams();
   const [isPopup, setIsPopup] = useState(false);
   const [activeUser, setActiveUser] = useState(false);
-  const [conversation, setConversation] = useState();
+  const [conversation, setConversation] = useState<any>(null);
+  const [isCallActive, setIsCallActive] = useState(false);
   const api = "ba93387e-dd58-46ae-bdce-75702895b305";
   const router = useRouter();
-  const vapi = new Vapi(api);
+  const [vapi, setVapi] = useState<Vapi | null>(null);
 
   useEffect(() => {
-    if (job) {
+    // Initialize Vapi
+    const vapiInstance = new Vapi(api);
+    setVapi(vapiInstance);
+    
+    // Set up event listeners
+    vapiInstance.on("call-start", () => {
+      console.log("Call started");
+      setActiveUser(true);
+      setIsCallActive(true);
+    });
+    
+    vapiInstance.on("call-end", () => {
+      console.log("Call ended");
+      setActiveUser(false);
+      setIsCallActive(false);
+      // Wait a bit for final messages to arrive
+      setTimeout(() => {
+        GenerateFeedback();
+      }, 2000);
+      router.push(`/interview/${interviewId}/complete`);
+    });
+    
+    vapiInstance.on("speech-start", () => {
+      console.log("speech start");
+      setActiveUser(true);
+    });
+    
+    vapiInstance.on("speech-end", () => {
+      console.log("speech end");
+      setActiveUser(false);
+    });
+    
+    vapiInstance.on("message", (message) => {
+      // Handle different message structures
+      if (message?.conversation) {
+        setConversation(message.conversation);
+        console.log("Set conversation:", message.conversation);
+      } else if (message?.transcript) {
+        setConversation(message.transcript);
+        console.log("Set transcript as conversation:", message.transcript);
+      } else if (message?.content) {
+        setConversation(message.content);
+        console.log("Set content as conversation:", message.content);
+      } else {
+        console.log("No conversation data found in message:", message);
+      }
+    });
+
+    // Cleanup on unmount
+    return () => {
+      vapiInstance.stop();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (job && vapi) {
       console.log("Starting interview...");
       start();
     }
-  }, [job]);
+  }, [job, vapi]);
 
   const start = async () => {
     const questionList =
@@ -85,39 +143,56 @@ Key Guidelines:
     };
 
     try {
-      // vapi.start(assistantOptions);
+      if (vapi) {
+        await vapi.start(assistantOptions);
+        console.log("Vapi call started successfully");
+      } else {
+        console.error("Vapi not initialized");
+      }
     } catch (err) {
       console.error("Error starting assistant:", err);
     }
   };
-  vapi.on("call-start", () => console.log("Call started"));
-  vapi.on("call-end", () => console.log("Call ended"));
-  vapi.on("speech-start", () => {
-    console.log("speech start");
-    setActiveUser(true);
-  });
-  vapi.on("speech-end", () => {
-    console.log("speech end");
-    setActiveUser(false);
-  });
-  vapi.on("message", (message) => {
-    console.log(message?.conversation);
-    setConversation(message?.conversation);
-  });
-  vapi.on("call-end", () => {
-    console.log("call end");
-    GenerateFeedback();
-  });
   async function handleStop() {
     setIsPopup(true);
   }
   async function GenerateFeedback() {
-    const result = await axios.post("/api/feedback");
-    {
-      conversation: conversation;
+    try {
+     // Check if conversation data exists
+      if (!conversation) {
+        console.log("No conversation data available for feedback generation");
+        return;
+      }
+      
+      // Convert conversation to string if it's an array or object
+      let conversationText: string = conversation;
+      if (Array.isArray(conversation)) {
+        conversationText = conversation.map((msg: any) => 
+          typeof msg === 'string' ? msg : JSON.stringify(msg)
+        ).join('\n');
+      } else if (typeof conversation === 'object') {
+        conversationText = JSON.stringify(conversation);
+      }
+
+      console.log("Sending conversation text:", conversationText);
+
+      const result = await axios.post("/api/feedback", {
+        conversation: conversationText
+      });
+      const content = result.data.content;
+      const Final = content.replace("```json", "").replace("```", "");
+      console.log("Feedback generated:", Final);
+      const finalresult=await axios.post("/api/interviewfeedback", {  
+        username: candidateName,
+        email: email,
+        feedback: Final,
+        interviewId: interviewId,
+      });
+      console.log("Final result:", finalresult);
+      //save to data base
+    } catch (error) {
+      console.error("Error generating feedback:", error);
     }
-    const content = result.data.content;
-    const Final = content.replace("```json", "").replace("```", "");
   }
   return (
     <div className="h-screen w-full bg-black text-white">
@@ -170,13 +245,23 @@ Key Guidelines:
               <FaMicrophone />
             </div>
           </div>
+          <div 
+            className="h-10 w-10 bg-green-600 flex items-center justify-center rounded-full cursor-pointer"
+            onClick={() => start()}
+          >
+            <div className="text-white text-xl">
+              <IoCall />
+            </div>
+          </div>
           <div className="h-10 w-10 bg-red-600 flex items-center justify-center rounded-full">
-            <div onClick={handleStop} className="text-white text-xl">
+            <div onClick={handleStop} className="text-white text-xl cursor-pointer">
               <IoCall />
             </div>
           </div>
         </div>
-        <div className="text-center">Interview in Progress</div>
+        <div className="text-center">
+          {isCallActive ? "Interview in Progress" : "Interview Ready - Click Green Button to Start"}
+        </div>
       </div>
       {isPopup && (
         <div className=" fixed inset-0 flex  items-center justify-center z-50">
@@ -190,7 +275,9 @@ Key Guidelines:
             }}
             onSubmit={() => {
               setIsPopup(false);
-              vapi.stop();
+              if (vapi) {
+                vapi.stop();
+              }
               router.push("/");
             }}
           />
