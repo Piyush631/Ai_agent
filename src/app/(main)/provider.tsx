@@ -5,6 +5,7 @@ function Dashboardprovider({ children }: any) {
   const [open, setOpen] = useState(true);
 
   return (
+    
     <div className="flex min-h-screen">
       <Sidebar open={open} setOpen={setOpen} />
 

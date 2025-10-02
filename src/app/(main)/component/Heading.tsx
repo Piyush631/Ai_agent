@@ -2,7 +2,7 @@ import { FaBell } from "react-icons/fa";
 
 export default function Heading() {
   return (
-    <div className="h-20 rounded-xl w-full items-center px-3 bg-white flex justify-between">
+    <div className="h-20 rounded-xl w-full items-center px-3 bg-gray-100 mb-3 flex justify-between">
       <div className="">
         <div className="text-lg font-semibold ">Welcome back piyush</div>
         <div className="text-md text-gray-400">

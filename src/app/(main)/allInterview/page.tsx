@@ -1,13 +1,8 @@
 "use client";
-
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { MdCall } from "react-icons/md";
 import axios from "axios";
 import { FaCopy } from "react-icons/fa";
-import { IoIosSend } from "react-icons/io";
-
-import { MdVideoCall } from "react-icons/md";
+import { IoIosSend } from "react-icons/io"
 import { useEffect, useState } from "react";
 interface InterviewData {
   id: number;
@@ -18,93 +13,48 @@ interface InterviewData {
   question: string[];
   userId: number;
 }
-function Dashboard() {
-  const router = useRouter();
-  const [interviewData, setInterviewData] = useState<InterviewData[]>([])
-  const [loading, setLoading] = useState(true)
-  const [copiedId, setCopiedId] = useState<number | null>(null)
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      const response = await axios.get("/api/generatequestion");
-      console.log("response");
-      console.log(response.data);
-      setInterviewData(response.data)
-      setLoading(false)
-    }
-    fetchData();
-  }, [])
 
-  const handleCopyLink = async (interviewId: number) => {
-    const link = `${window.location.origin}/interview/${interviewId}`;
-    try {
-      await navigator.clipboard.writeText(link);
-      setCopiedId(interviewId);
-      setTimeout(() => setCopiedId(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy link:', err);
-    }
-  };
 
-  const handleSendInterview = (interviewId: number) => {
-    // You can implement email sending functionality here
-    console.log('Send interview:', interviewId);
-  };
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
- 
-      
-      {/* Header Section */}
-      <div className="px-6 py-8">
-        <div className="text-4xl font-bold text-gray-800 mb-2">Dashboard</div>
-        <div className="text-gray-600">Manage your AI interviews and track candidate progress</div>
-      </div>
+export default function AllInterview() {
 
-      {/* Action Cards */}
-      <div className="px-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
-          <div 
-            className="group p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-blue-200"
-            onClick={() => router.push('/createinterview')}
-          >
-            <div className="flex items-center mb-4">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-300">
-                <MdVideoCall />
-              </div>
-              <div className="ml-4">
-                <h3 className="text-xl font-semibold text-gray-800">Create New Interview</h3>
-                <p className="text-gray-600 text-sm">AI-powered interview creation</p>
-              </div>
-            </div>
-            <p className="text-gray-600 leading-relaxed">
-              Create AI interviews and schedule them with candidates. Generate custom questions based on job requirements.
-            </p>
-          </div>
-
-          <div className="group p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-green-200">
-            <div className="flex items-center mb-4">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-300">
-                <MdCall />
-              </div>
-              <div className="ml-4">
-                <h3 className="text-xl font-semibold text-gray-800">Phone Screening</h3>
-                <p className="text-gray-600 text-sm">Quick candidate screening</p>
-              </div>
-            </div>
-            <p className="text-gray-600 leading-relaxed">
-              Schedule phone screening calls with potential candidates for initial assessment.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Interviews Section */}
-      <div className="px-6">
+    const router = useRouter();
+    const [interviewData, setInterviewData] = useState<InterviewData[]>([])
+    const [loading, setLoading] = useState(true)
+    const [copiedId, setCopiedId] = useState<number | null>(null)
+    useEffect(() => {
+      const fetchData = async () => {
+        setLoading(true)
+        const response = await axios.get("/api/generatequestion");
+        console.log("response");
+        console.log(response.data);
+        setInterviewData(response.data)
+        setLoading(false)
+      }
+      fetchData();
+    }, [])
+  
+    const handleCopyLink = async (interviewId: number) => {
+      const link = `${window.location.origin}/interview/${interviewId}`;
+      try {
+        await navigator.clipboard.writeText(link);
+        setCopiedId(interviewId);
+        setTimeout(() => setCopiedId(null), 2000);
+      } catch (err) {
+        console.error('Failed to copy link:', err);
+      }
+    };
+  
+    const handleSendInterview = (interviewId: number) => {
+      // You can implement email sending functionality here
+      console.log('Send interview:', interviewId);
+    };
+  return <div>
+     <div className="px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800">Previously Created Interviews</h2>
-              <p className="text-gray-600">Manage and track your interview sessions</p>
+            <div className="mt-4">
+              <h2 className="text-2xl font-bold text-gray-800">All Interview</h2>
+              {/* <p className="text-gray-600">Manage and track your interview sessions</p> */}
             </div>
             {loading && (
               <div className="flex items-center space-x-2 text-blue-600">
@@ -123,7 +73,7 @@ function Dashboard() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {interviewData.slice(0, 4).map((interview) => (
+            {interviewData.map((interview) => (
               <div 
                 key={interview.id} 
                 className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 overflow-hidden"
@@ -188,7 +138,5 @@ function Dashboard() {
           </div>
         </div>
       </div>
-    </div>
-  );
+  </div>;
 }
-export default Dashboard;

@@ -21,12 +21,12 @@ const data = [
   },
   {
     name: "Scheduled interview",
-    link: "/home",
+    link: "/scheduledInterview",
     icon: <RiCalendarScheduleLine />,
   },
   {
     name: "All interview",
-    link: "/interview",
+    link: "/allInterview",
     icon: <TfiMenuAlt />,
   },
   {
